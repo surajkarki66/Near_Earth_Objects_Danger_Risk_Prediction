@@ -1,5 +1,7 @@
 # Near_Earth_Objects_Danger_Risk_Prediction
+
 ## Overview
+
 This project focuses on predicting whether a Near-Earth Object (NEO) poses a potential hazard based on various characteristics. Given the increasing concerns about NEOs and their potential impact, the goal is to leverage machine learning to classify them as hazardous or non-hazardous. The dataset spans observations of NEOs recorded between 1910 and 2024, with the primary target variable being is_hazardous.
 
 The workflow encompasses several stages: data cleaning, exploratory data analysis (EDA), addressing class imbalance, model training, and performance evaluation. Among the models tested, the Random Forest classifier demonstrated the highest accuracy in identifying hazardous NEOs.
@@ -9,7 +11,9 @@ In addition to model performance, interpretability was emphasized through the us
 Dataset Link: https://drive.google.com/drive/folders/1iW295y-QzP5tQxDtVaP-rrldbIypQFzv?usp=sharing
 
 ## How to run the application?
+
 ### A. Locally
+
 ### 1. Install virtualenv package
 
 ```bash
@@ -21,7 +25,8 @@ pip install --upgrade virtualenv
 ```bash
 python -m venv .venv
 ```
-or 
+
+or
 
 ```bash
 python3 -m venv .venv
@@ -48,16 +53,14 @@ pip install --upgrade -r requirements.txt
 
 ### 4. Download the binary model from the [this link](https://github.com/surajkarki66/Near_Earth_Objects_Danger_Risk_Prediction/releases/download/v1.0.0/neo_rf.skops) and put the model file inside the `assets` directory.
 
-### 5. Download all csv files from [this link](https://drive.google.com/drive/folders/1iW295y-QzP5tQxDtVaP-rrldbIypQFzv?usp=sharing) and put them inside the `data` directory.
-
-
-### 6. Run the streamlit app within the virtual environment
+### 5. Run the streamlit app within the virtual environment
 
 ```bash
 streamlit run streamlit_app.py
 ```
 
 ## Credits
+
 The dataset used in this project is sourced from Kaggle. It contains information about Near-Earth Objects (NEOs) recorded by NASA and includes various features such as absolute magnitude, estimated diameter, relative velocity, and miss distance. The dataset spans observations from 1910 to 2024, providing a comprehensive view of NEOs over time.
 
 You can access the dataset at the following link: [NASA Nearest Earth Objects Dataset](https://www.kaggle.com/datasets/sameepvani/nasa-nearest-earth-objects/data).
