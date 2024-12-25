@@ -58,6 +58,20 @@ pip install --upgrade -r requirements.txt
 ```bash
 streamlit run streamlit_app.py
 ```
+### B. Docker
+### Docker commands :computer:
+
+To build the docker image locally, run the following command:
+
+```bash
+docker build --progress=plain --tag streamlit:latest .
+```
+
+Then to run the docker container locally, run the following command:
+
+```bash
+docker run -ti -p 8501:8501 --rm streamlit:latest
+```
 
 ## Credits
 
