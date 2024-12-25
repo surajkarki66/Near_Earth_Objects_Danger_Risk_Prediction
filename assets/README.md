@@ -1,0 +1,2 @@
+### Model File Location
+Note: Download the binary model from the [this link](https://github.com/surajkarki66/Near_Earth_Objects_Danger_Risk_Prediction/releases/download/v1.0.0/neo_rf.skops) and put the model file inside the `assets` directory.
