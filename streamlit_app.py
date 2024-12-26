@@ -9,24 +9,37 @@ import skops.io as sio
 
 @st.cache_resource
 def load_data():
-    # Load the dataset
-    base_dir = os.getcwd()
-    file_path = os.path.join(base_dir, "data", "smote_data.csv")
-    df = pd.read_csv(file_path)
-    
-    X = df.drop(['is_hazardous', 'Unnamed: 0'], axis=1)
-    y = df['is_hazardous']
-    return X, y
+    try:
+        # Load the dataset
+        base_dir = os.getcwd()
+        file_path = os.path.join(base_dir, "data", "smote_data.csv")
+        df = pd.read_csv(file_path)
+        X = df.drop(['is_hazardous', 'Unnamed: 0'], axis=1)
+        y = df['is_hazardous']
+        return X, y
+    except FileNotFoundError:
+        st.error("🚨 Data file not found. Please ensure `smote_data.csv` exists in the `data` directory.")
+        return None, None
+    except Exception as e:
+        st.error(f"🚨 An error occurred while loading data: {e}")
+        return None, None
+
 
 @st.cache_resource
 def load_model():
-    # Current working directory
-    base_dir = os.getcwd()
-    file_path = os.path.join(base_dir, "assets", "neo_rf.skops")
-    unknown_types = sio.get_untrusted_types(file=file_path)
-    # Investigate the contents of unknown_types and only load if trusted.
-    clf = sio.load(file_path, trusted=unknown_types)
-    return clf
+    try:
+        # Load the model
+        base_dir = os.getcwd()
+        file_path = os.path.join(base_dir, "assets", "neo_rf.skops")
+        unknown_types = sio.get_untrusted_types(file=file_path)
+        clf = sio.load(file_path, trusted=unknown_types)
+        return clf
+    except FileNotFoundError:
+        st.error("🚨 Model file not found. Please ensure `neo_rf.skops` exists in the `assets` directory.")
+        return None
+    except Exception as e:
+        st.error(f"🚨 An error occurred while loading the model: {e}")
+        return None
 
 
 # Streamlit App Configuration
@@ -49,39 +62,41 @@ miss_distance = st.sidebar.number_input("Distance in kilometers missed", value=5
 # Load the model at app startup (cached)
 model = load_model()
 
-#Load the data at app startup (cached)
+# Load the data at app startup (cached)
 X, _ = load_data()
 
-# Predict Button
-if st.sidebar.button("Predict"):
-    # Prepare input data
-    input_data = [[absolute_magnitude, estimated_diameter_max, relative_velocity, np.log1p(miss_distance)]]
-    input_array = np.array(input_data)
-    y_pred = model.predict(input_array)[0]
-    y_pred_proba = model.predict_proba(input_array)[0][y_pred]
-  
-    # Display the prediction result in a stylish way
-    st.subheader("Prediction Result")
-    if y_pred == 1:
-        st.error(f"⚠️ **Hazardous!** This NEO is likely dangerous with a probability of {y_pred_proba:.2%}.")
-    else:
-        st.success(f"✅ **Not Hazardous.** This NEO is not dangerous with a probability of {y_pred_proba:.2%}.")
-    
-    st.subheader("Explanation")
-    feature_names = X.columns.tolist()
-    class_names = ["No Hazardous", "Hazardous"]
-   
-    explainer = lime.lime_tabular.LimeTabularExplainer(X.values, feature_names = feature_names, class_names = class_names, discretize_continuous=True,)
-    exp = explainer.explain_instance(input_array[0], model.predict_proba, num_features=4)
-    # Display explanation as HTML
-    components_html = exp.as_html()
-    st.components.v1.html(components_html, height=300, scrolling=True)
-
-        
+# Check if both model and data are available
+if model is None or X is None:
+    st.warning("🚧 The application cannot proceed as required resources are unavailable.")
 else:
-    # Placeholder message when no prediction is made
-    st.subheader("Awaiting Prediction")
-    st.info("Use the sidebar to input the features of a near-Earth object, then click **Predict** to see the results.")
+    # Predict Button
+    if st.sidebar.button("Predict"):
+        # Prepare input data
+        input_data = [[absolute_magnitude, estimated_diameter_max, relative_velocity, np.log1p(miss_distance)]]
+        input_array = np.array(input_data)
+        y_pred = model.predict(input_array)[0]
+        y_pred_proba = model.predict_proba(input_array)[0][y_pred]
+      
+        # Display the prediction result in a stylish way
+        st.subheader("Prediction Result")
+        if y_pred == 1:
+            st.error(f"⚠️ **Hazardous!** This NEO is likely dangerous with a probability of {y_pred_proba:.2%}.")
+        else:
+            st.success(f"✅ **Not Hazardous.** This NEO is not dangerous with a probability of {y_pred_proba:.2%}.")
+        
+        st.subheader("Explanation")
+        feature_names = X.columns.tolist()
+        class_names = ["No Hazardous", "Hazardous"]
+       
+        explainer = lime.lime_tabular.LimeTabularExplainer(X.values, feature_names=feature_names, class_names=class_names, discretize_continuous=True)
+        exp = explainer.explain_instance(input_array[0], model.predict_proba, num_features=4)
+        # Display explanation as HTML
+        components_html = exp.as_html()
+        st.components.v1.html(components_html, height=300, scrolling=True)
+    else:
+        # Placeholder message when no prediction is made
+        st.subheader("Awaiting Prediction")
+        st.info("Use the sidebar to input the features of a near-Earth object, then click **Predict** to see the results.")
 
 # Footer Section
 st.write("---")
